@@ -43,7 +43,8 @@ class _HomeState extends State<Home> {
     Uri.parse(
         "https://paws-for-cause.mangohill-61f2fe59.northeurope.azurecontainerapps.io/isb/feed/all");
     final response = await http.get(
-        url, headers: {"Content-Type": "application/json"});
+        url, headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin" : "*",
+      "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"});
     final List body = json.decode(response.body);
 
     return body.map((e) => FeedEvents.fromJson(e)).toList();
@@ -122,42 +123,42 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to the AddEventScreen and pass the callback function
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  AddEventScreen(
-                    onEventAdded: (spotName) async {
-                      // Perform API call to add a new event here
-                      final success = await makeAddEventApiCall(spotName);
-                      if (success) {
-                        Fluttertoast.showToast(
-                          msg: 'Event added successfully',
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                        );
-                        _refreshData(); // Refresh the list view
-                      } else {
-                        Fluttertoast.showToast(
-                          msg: 'Failed to add event',
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                        );
-                      }
-                    },
-                  ),
-            ),
-          );
-        },
-        backgroundColor: Colors.red,
-        child: const Text(
-          "+",
-          style: TextStyle(fontSize: 30),
-        ),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // Navigate to the AddEventScreen and pass the callback function
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) =>
+      //             AddEventScreen(
+      //               onEventAdded: (spotName) async {
+      //                 // Perform API call to add a new event here
+      //                 final success = await makeAddEventApiCall(spotName);
+      //                 if (success) {
+      //                   Fluttertoast.showToast(
+      //                     msg: 'Event added successfully',
+      //                     toastLength: Toast.LENGTH_SHORT,
+      //                     gravity: ToastGravity.BOTTOM,
+      //                   );
+      //                   _refreshData(); // Refresh the list view
+      //                 } else {
+      //                   Fluttertoast.showToast(
+      //                     msg: 'Failed to add event',
+      //                     toastLength: Toast.LENGTH_SHORT,
+      //                     gravity: ToastGravity.BOTTOM,
+      //                   );
+      //                 }
+      //               },
+      //             ),
+      //       ),
+      //     );
+      //   },
+      //   backgroundColor: Colors.red,
+      //   child: const Text(
+      //     "+",
+      //     style: TextStyle(fontSize: 30),
+      //   ),
+      // ),
     );
   }
 
@@ -166,7 +167,8 @@ class _HomeState extends State<Home> {
         "https://paws-for-cause.mangohill-61f2fe59.northeurope.azurecontainerapps.io/isb/addEvent");
     final body = spotName; // Adjust the body as per your API requirements
     final response = await http.post(
-        url, body: body, headers: {"Content-Type": "application/json"});
+        url, body: body, headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin" : "*",
+      "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"});
 
     if (response.statusCode == 200) {
       return true; // Success
@@ -292,7 +294,8 @@ Future<void> showFeedConfirmationDialog(
 Future<bool> makeFeedApiCall(String spotName) async {
   final url = Uri.parse("https://paws-for-cause.mangohill-61f2fe59.northeurope.azurecontainerapps.io/isb/feed");
   final body = spotName; // Assuming your API expects a JSON body with the spot name
-  final response = await http.post(url, body: body, headers: {"Content-Type": "application/json"});
+  final response = await http.post(url, body: body, headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin" : "*",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"});
 
   if (response.statusCode == 200) {
     return true; // Success
