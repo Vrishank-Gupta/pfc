@@ -7,19 +7,18 @@ import 'package:intl/intl.dart';
 
 import 'addEvent.dart';
 
-// void main() => runApp(const MaterialApp(
-//
-//   home: Home(),
-// ));
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(Home());
-}
+void main() => runApp(const MaterialApp(
+  home: Home(),
+));
+// void main() {
+//   // WidgetsFlutterBinding.ensureInitialized();
+//   runApp(const Home());
+// }
 const String name = "Hello";
 
 class Home extends StatefulWidget {
-  Home({super.key});
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  const Home({super.key});
+  // final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   State<Home> createState() => _HomeState();
 }

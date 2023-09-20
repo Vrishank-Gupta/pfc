@@ -1,7 +1,13 @@
 {
   "hosting": {
-    "site": "paws-for-cause",
-
-    "public": "public"
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    }
   }
 }
