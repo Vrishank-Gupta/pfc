@@ -1,24 +1,32 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-void main() => runApp(const MaterialApp(
-  home: Home(),
-));
+import 'addEvent.dart';
 
+// void main() => runApp(const MaterialApp(
+//
+//   home: Home(),
+// ));
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(Home());
+}
 const String name = "Hello";
 
 class Home extends StatefulWidget {
-  const Home({super.key});
-
+  Home({super.key});
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
   Future<List<FeedEvents>>? eventsFuture;
+
   void _refreshData() {
     setState(() {
       eventsFuture = fetchEvents();
@@ -33,8 +41,10 @@ class _HomeState extends State<Home> {
 
   static Future<List<FeedEvents>> fetchEvents() async {
     var url =
-    Uri.parse("https://paws-for-cause.mangohill-61f2fe59.northeurope.azurecontainerapps.io/isb/feed/all");
-    final response = await http.get(url, headers: {"Content-Type": "application/json"});
+    Uri.parse(
+        "https://paws-for-cause.mangohill-61f2fe59.northeurope.azurecontainerapps.io/isb/feed/all");
+    final response = await http.get(
+        url, headers: {"Content-Type": "application/json"});
     final List body = json.decode(response.body);
 
     return body.map((e) => FeedEvents.fromJson(e)).toList();
@@ -44,7 +54,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      appBar:AppBar(
+      appBar: AppBar(
         title: const Text('Paws For Cause'),
         centerTitle: true,
         backgroundColor: Colors.grey[850],
@@ -65,11 +75,31 @@ class _HomeState extends State<Home> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               const Text(
-                "A full bowl, a wagging tail – that's where happiness begins.",
-                style: TextStyle(color: Colors.red, fontSize: 19),
+                "\"A full bowl, a wagging tail – that's where happiness begins\"",
+                style: TextStyle(
+                  color: Colors.red,
+                  // Text color
+                  fontSize: 24,
+                  // Font size
+                  fontStyle: FontStyle.italic,
+                  // Italic
+                  letterSpacing: 1.5,
+                  // Letter spacing
+                  fontFamily: 'Roboto', // Custom font (if available)
+                  // You can also set shadows, background, and more here
+                ),
+                textAlign: TextAlign.center, // Center align the text
               ),
-              Image.network(
-                  "https://images.unsplash.com/photo-1611003228941-98852ba62227?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"),
+              Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 400, // Set the maximum width
+                  maxHeight: 300, // Set the maximum height
+                ),
+                child: Image.network(
+                  "https://images.unsplash.com/photo-1611003228941-98852ba62227?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
+                  fit: BoxFit.cover, // Adjust the BoxFit property as needed
+                ),
+              ),
               Expanded(
                 child: FutureBuilder<List<FeedEvents>>(
                   future: eventsFuture,
@@ -78,7 +108,8 @@ class _HomeState extends State<Home> {
                       return const CircularProgressIndicator();
                     } else if (snapshot.hasData) {
                       final events = snapshot.data!;
-                      return buildPosts(filterLatestEvents(events), _refreshData);
+                      return buildPosts(
+                          filterLatestEvents(events), _refreshData);
                     } else if (snapshot.hasError) {
                       return Text("Error: ${snapshot.error}");
                     } else {
@@ -94,7 +125,33 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print("Adding new pot");
+          // Navigate to the AddEventScreen and pass the callback function
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AddEventScreen(
+                    onEventAdded: (spotName) async {
+                      // Perform API call to add a new event here
+                      final success = await makeAddEventApiCall(spotName);
+                      if (success) {
+                        Fluttertoast.showToast(
+                          msg: 'Event added successfully',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                        );
+                        _refreshData(); // Refresh the list view
+                      } else {
+                        Fluttertoast.showToast(
+                          msg: 'Failed to add event',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                        );
+                      }
+                    },
+                  ),
+            ),
+          );
         },
         backgroundColor: Colors.red,
         child: const Text(
@@ -103,6 +160,20 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+  }
+
+  Future<bool> makeAddEventApiCall(String spotName) async {
+    final url = Uri.parse(
+        "https://paws-for-cause.mangohill-61f2fe59.northeurope.azurecontainerapps.io/isb/addEvent");
+    final body = spotName; // Adjust the body as per your API requirements
+    final response = await http.post(
+        url, body: body, headers: {"Content-Type": "application/json"});
+
+    if (response.statusCode == 200) {
+      return true; // Success
+    } else {
+      return false; // Failure
+    }
   }
 }
 
@@ -161,7 +232,7 @@ Widget buildPosts(List<FeedEvents> events, Function refreshCallback) {
             SizedBox(width: 10),
             Expanded(flex: 3, child: Text("Location: " + event.spot!.toUpperCase())),
             SizedBox(width: 10),
-            Expanded(flex: 3, child: Text("Last fed: ${event.timeOfDay}")),
+            Expanded(flex: 3, child: Text("Last fed: ${event.getTimeInIST()}")),
             TextButton(
               child: const Text('FEED NOW'),
               onPressed: () {
@@ -249,4 +320,14 @@ class FeedEvents {
     "fed": fed,
     "spot": spot,
   };
+
+  String? getTimeInIST() {
+    if (timeOfDay != null) {
+      final dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
+      final utcDateTime = dateFormat.parse(timeOfDay!);
+      final istDateTime = utcDateTime.add(const Duration(hours: 5, minutes: 30));
+      return DateFormat("dd-MM-yyyy HH:mm:ss").format(istDateTime);
+    }
+    return null;
+  }
 }

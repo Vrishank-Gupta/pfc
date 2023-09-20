@@ -1,0 +1,7 @@
+{
+  "hosting": {
+    "site": "paws-for-cause",
+
+    "public": "public"
+  }
+}

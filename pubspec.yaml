@@ -1,4 +1,4 @@
-name: untitled1
+name: PawsForCause
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   intl: ^0.17.0
   fluttertoast: ^8.0.7
+  firebase_core: ^2.16.0
 
 
   # The following adds the Cupertino Icons font to your application.
