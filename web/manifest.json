@@ -1,11 +1,11 @@
 {
-    "name": "untitled1",
-    "short_name": "untitled1",
+    "name": "Paws For Cause",
+    "short_name": "Paws For Cause",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Feed the loyal friends",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
