@@ -224,15 +224,15 @@ Widget buildPosts(List<FeedEvents> events, Function refreshCallback) {
       final event = events[index];
       return Container(
         color: Colors.grey.shade300,
-        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         height: 100,
         width: double.maxFinite,
         child: Column(
           children: [
-            SizedBox(width: 10),
-            Expanded(flex: 3, child: Text("Location: " + event.spot!.toUpperCase())),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
+            Expanded(flex: 3, child: Text("Location: ${event.spot!.toUpperCase()}")),
+            const SizedBox(width: 10),
             Expanded(flex: 3, child: Text("Last fed: ${event.getTimeInIST()}")),
             TextButton(
               child: const Text('FEED NOW'),
@@ -257,13 +257,13 @@ Future<void> showFeedConfirmationDialog(
         title: Text('Feed the dogs at $spotName?'),
         actions: <Widget>[
           TextButton(
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           TextButton(
-            child: Text('Yes'),
+            child: const Text('Yes'),
             onPressed: () async {
               final success = await makeFeedApiCall(spotName);
               if (success) {
@@ -328,8 +328,42 @@ class FeedEvents {
       final dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
       final utcDateTime = dateFormat.parse(timeOfDay!);
       final istDateTime = utcDateTime.add(const Duration(hours: 5, minutes: 30));
-      return DateFormat("dd-MM-yyyy HH:mm:ss").format(istDateTime);
+
+      // Get the current date in IST
+      final now = DateTime.now().toUtc().add(const Duration(hours: 5, minutes: 30));
+
+      if (now.year == istDateTime.year &&
+          now.month == istDateTime.month &&
+          now.day == istDateTime.day) {
+        // The event happened today
+        final formattedTime = DateFormat.jm().format(istDateTime); // Format as time
+        return 'Today at $formattedTime';
+      } else {
+        // The event did not happen today, so check if it happened yesterday
+        final yesterday = now.subtract(const Duration(days: 1));
+        if (yesterday.year == istDateTime.year &&
+            yesterday.month == istDateTime.month &&
+            yesterday.day == istDateTime.day) {
+          // The event happened yesterday
+          final formattedTime = DateFormat.jm().format(istDateTime); // Format as time
+          return 'Yesterday at $formattedTime';
+        } else {
+          // The event happened on a different day
+          final formattedDate = DateFormat('dd-MM-yyyy').format(istDateTime); // Format as date
+          return '$formattedDate at ${DateFormat.jm().format(istDateTime)}';
+        }
+      }
     }
     return null;
   }
+
+// String? getTimeInIST() {
+  //   if (timeOfDay != null) {
+  //     final dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
+  //     final utcDateTime = dateFormat.parse(timeOfDay!);
+  //     final istDateTime = utcDateTime.add(const Duration(hours: 5, minutes: 30));
+  //     return DateFormat("dd-MM-yyyy HH:mm:ss").format(istDateTime);
+  //   }
+  //   return null;
+  // }
 }
