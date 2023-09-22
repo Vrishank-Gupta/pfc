@@ -95,8 +95,7 @@ class _HomeState extends State<Home> {
                   maxWidth: 400, // Set the maximum width
                   maxHeight: 300, // Set the maximum height
                 ),
-                child: Image.network(
-                  "https://images.unsplash.com/photo-1611003228941-98852ba62227?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
+                child: Image.asset('dog_image.png',
                   fit: BoxFit.cover, // Adjust the BoxFit property as needed
                 ),
               ),
